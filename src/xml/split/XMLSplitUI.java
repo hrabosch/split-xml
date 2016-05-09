@@ -5,17 +5,38 @@
  */
 package xml.split;
 
+import java.io.IOException;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 /**
  *
  * @author hrabosch
  */
 public class XMLSplitUI extends javax.swing.JFrame {
 
+    private Document doc;
+
     /**
      * Creates new form XMLSplitUI
      */
     public XMLSplitUI() {
         initComponents();
+        fileSummaryPanel.setVisible(false);
     }
 
     /**
@@ -27,10 +48,14 @@ public class XMLSplitUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jMenuBar1 = new javax.swing.JMenuBar();
+        infoTextLabel = new javax.swing.JLabel();
+        fileSummaryPanel = new javax.swing.JPanel();
+        structureScrollPanel = new javax.swing.JScrollPane();
+        docStructureTree = new javax.swing.JTree();
+        mainMenuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
+        openMenuItem = new javax.swing.JMenuItem();
+        exitMenuItem = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -38,54 +63,103 @@ public class XMLSplitUI extends javax.swing.JFrame {
         setPreferredSize(new java.awt.Dimension(800, 600));
         setResizable(false);
 
+        infoTextLabel.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        infoTextLabel.setForeground(new java.awt.Color(102, 102, 102));
+        infoTextLabel.setText("Open file by menu File -> Open (CTRL+O)");
+
+        fileSummaryPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        structureScrollPanel.setViewportView(docStructureTree);
+
+        javax.swing.GroupLayout fileSummaryPanelLayout = new javax.swing.GroupLayout(fileSummaryPanel);
+        fileSummaryPanel.setLayout(fileSummaryPanelLayout);
+        fileSummaryPanelLayout.setHorizontalGroup(
+            fileSummaryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(fileSummaryPanelLayout.createSequentialGroup()
+                .addComponent(structureScrollPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 507, Short.MAX_VALUE))
+        );
+        fileSummaryPanelLayout.setVerticalGroup(
+            fileSummaryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(fileSummaryPanelLayout.createSequentialGroup()
+                .addComponent(structureScrollPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
         fileMenu.setText("File");
 
-        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
-        jMenuItem1.setText("Open");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        openMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
+        openMenuItem.setText("Open");
+        openMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                openMenuItemActionPerformed(evt);
             }
         });
-        fileMenu.add(jMenuItem1);
+        fileMenu.add(openMenuItem);
 
-        jMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.event.InputEvent.CTRL_MASK));
-        jMenuItem2.setText("Exit");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+        exitMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.event.InputEvent.CTRL_MASK));
+        exitMenuItem.setText("Exit");
+        exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
+                exitMenuItemActionPerformed(evt);
             }
         });
-        fileMenu.add(jMenuItem2);
+        fileMenu.add(exitMenuItem);
 
-        jMenuBar1.add(fileMenu);
+        mainMenuBar.add(fileMenu);
 
         helpMenu.setText("Help");
-        jMenuBar1.add(helpMenu);
+        mainMenuBar.add(helpMenu);
 
-        setJMenuBar(jMenuBar1);
+        setJMenuBar(mainMenuBar);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 800, Short.MAX_VALUE)
+            .addComponent(fileSummaryPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(207, 207, 207)
+                    .addComponent(infoTextLabel)
+                    .addContainerGap(208, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 500, Short.MAX_VALUE)
+            .addComponent(fileSummaryPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(284, 284, 284)
+                    .addComponent(infoTextLabel)
+                    .addContainerGap(285, Short.MAX_VALUE)))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMenuItemActionPerformed
+        JFileChooser fileopen = new JFileChooser();
+        FileFilter filter = new FileNameExtensionFilter("xml", "XML files");
+        fileopen.addChoosableFileFilter(filter);
 
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
+        int ret = fileopen.showDialog(null, "Open file");
+
+        if (ret == JFileChooser.APPROVE_OPTION) {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            try {
+                doc = dbf.newDocumentBuilder().parse(fileopen.getSelectedFile());
+                doc.normalizeDocument();
+                docStructureTree.setModel(new DefaultTreeModel(generateStructure(doc.getDocumentElement(), new DefaultMutableTreeNode("XML Structure"))));
+                showFileSummary();              
+            } catch (ParserConfigurationException | SAXException | IOException ex) {
+                Logger.getLogger(XMLSplitUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_openMenuItemActionPerformed
+
+    private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_exitMenuItemActionPerformed
 
     /**
      * @param args the command line arguments
@@ -123,10 +197,32 @@ public class XMLSplitUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTree docStructureTree;
+    private javax.swing.JMenuItem exitMenuItem;
     private javax.swing.JMenu fileMenu;
+    private javax.swing.JPanel fileSummaryPanel;
     private javax.swing.JMenu helpMenu;
-    private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JLabel infoTextLabel;
+    private javax.swing.JMenuBar mainMenuBar;
+    private javax.swing.JMenuItem openMenuItem;
+    private javax.swing.JScrollPane structureScrollPanel;
     // End of variables declaration//GEN-END:variables
+
+    private DefaultMutableTreeNode generateStructure(Node doc, DefaultMutableTreeNode root) {
+        DefaultMutableTreeNode treeNode = new DefaultMutableTreeNode(doc.getNodeName());
+
+        NodeList nodeList = doc.getChildNodes();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node currentNode = nodeList.item(i);
+            if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
+                root.add(generateStructure(currentNode, treeNode));
+            }
+        }
+        return root;
+    }
+
+    private void showFileSummary() {
+        infoTextLabel.setVisible(Boolean.FALSE);
+        fileSummaryPanel.setVisible(Boolean.TRUE);
+    }
 }
