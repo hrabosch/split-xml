@@ -1,15 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package xml.split;
 
-import java.awt.Font;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Optional;
 import static java.util.Optional.ofNullable;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -18,16 +15,10 @@ import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -46,6 +37,17 @@ public class XMLSplitUI extends javax.swing.JFrame {
         fileSummaryPanel.setVisible(false);
         UIManager.put("Label.font", new java.awt.Font("Carlito", 1, 18));
         docStructureTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        File propertiesFile = new File("resources/split-xml.properties");
+        FileReader reader;
+        try {
+            reader = new FileReader(propertiesFile);
+            Properties properties = new Properties();
+            properties.load(reader);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(XMLSplitUI.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(XMLSplitUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -76,6 +78,8 @@ public class XMLSplitUI extends javax.swing.JFrame {
         outPutLabel = new javax.swing.JLabel();
         outPutPathTextField = new javax.swing.JTextField();
         setOutPutLocationBtn = new javax.swing.JButton();
+        rootElementRenameBtn = new javax.swing.JButton();
+        itemElementRenameBtn = new javax.swing.JButton();
         mainMenuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         openMenuItem = new javax.swing.JMenuItem();
@@ -84,7 +88,6 @@ public class XMLSplitUI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("XML Split");
-        setPreferredSize(new java.awt.Dimension(800, 600));
         setResizable(false);
 
         infoTextLabel.setFont(new java.awt.Font("Carlito", 1, 18)); // NOI18N
@@ -127,10 +130,11 @@ public class XMLSplitUI extends javax.swing.JFrame {
         itemElementLabel.setText("Item element:");
 
         selectedRootElementLabel.setFont(new java.awt.Font("Carlito", 1, 12)); // NOI18N
-        selectedRootElementLabel.setText("Not selected");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("resources/split-xml"); // NOI18N
+        selectedRootElementLabel.setText(bundle.getString("label.not.selected")); // NOI18N
 
         selectedItemElementLabel.setFont(new java.awt.Font("Carlito", 1, 12)); // NOI18N
-        selectedItemElementLabel.setText("Not selected");
+        selectedItemElementLabel.setText(bundle.getString("label.not.selected")); // NOI18N
 
         splitButton.setText("Split it!");
         splitButton.addActionListener(new java.awt.event.ActionListener() {
@@ -147,6 +151,20 @@ public class XMLSplitUI extends javax.swing.JFrame {
         setOutPutLocationBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 setOutPutLocationBtnActionPerformed(evt);
+            }
+        });
+
+        rootElementRenameBtn.setText("Rename");
+        rootElementRenameBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rootElementRenameBtnActionPerformed(evt);
+            }
+        });
+
+        itemElementRenameBtn.setText("Rename");
+        itemElementRenameBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemElementRenameBtnActionPerformed(evt);
             }
         });
 
@@ -186,7 +204,11 @@ public class XMLSplitUI extends javax.swing.JFrame {
                                         .addComponent(selectedRootElementLabel))
                                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, fileSummaryPanelLayout.createSequentialGroup()
                                         .addGap(16, 16, 16)
-                                        .addComponent(selectedItemElementLabel))))
+                                        .addComponent(selectedItemElementLabel)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(fileSummaryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(rootElementRenameBtn)
+                                    .addComponent(itemElementRenameBtn)))
                             .addComponent(outPutLabel)
                             .addComponent(outPutPathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(setOutPutLocationBtn))
@@ -208,15 +230,17 @@ public class XMLSplitUI extends javax.swing.JFrame {
                         .addGroup(fileSummaryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(byValueLabel)
                             .addComponent(byValueTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(50, 50, 50)
+                        .addGap(44, 44, 44)
                         .addGroup(fileSummaryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(rootElementLabel)
-                            .addComponent(selectedRootElementLabel))
+                            .addComponent(selectedRootElementLabel)
+                            .addComponent(rootElementRenameBtn))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(fileSummaryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(itemElementLabel)
-                            .addComponent(selectedItemElementLabel))
-                        .addGap(62, 62, 62)
+                            .addComponent(selectedItemElementLabel)
+                            .addComponent(itemElementRenameBtn))
+                        .addGap(58, 58, 58)
                         .addComponent(outPutLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(outPutPathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -342,11 +366,11 @@ public class XMLSplitUI extends javax.swing.JFrame {
     }//GEN-LAST:event_selectItemBtnActionPerformed
 
     private void splitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_splitButtonActionPerformed
-        if (outPutPathTextField.getText().length()>0 && byValueTextField.getText().matches("[0-9]+") && byValueTextField.getText().length()>0 && xmlFile.validateIt()) {
+        if (outPutPathTextField.getText().length() > 0 && byValueTextField.getText().matches("[0-9]+") && byValueTextField.getText().length() > 0 && xmlFile.validateIt()) {
             try {
                 int finished = xmlFile.splitFile(outPutPathTextField.getText(), Integer.parseInt(byValueTextField.getText()));
-                JOptionPane.showMessageDialog(rootPane, Messages.SPLIT_FINISHED.formatMessage(finished), 
-                        Messages.SPLIT_FINISHED.getTitle(), JOptionPane.INFORMATION_MESSAGE);                
+                JOptionPane.showMessageDialog(rootPane, Messages.SPLIT_FINISHED.formatMessage(finished),
+                        Messages.SPLIT_FINISHED.getTitle(), JOptionPane.INFORMATION_MESSAGE);
             } catch (ParserConfigurationException ex) {
                 Logger.getLogger(XMLSplitUI.class.getName()).log(Level.SEVERE, null, ex);
             } catch (Exception ex) {
@@ -367,6 +391,23 @@ public class XMLSplitUI extends javax.swing.JFrame {
             outPutPathTextField.setText(fc.getSelectedFile().getAbsolutePath());
         }
     }//GEN-LAST:event_setOutPutLocationBtnActionPerformed
+
+    private void rootElementRenameBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rootElementRenameBtnActionPerformed
+        if (rootElementLabel.getText().equals(java.util.ResourceBundle.getBundle("resources/split-xml").getString("label.not.selected"))) {
+            JOptionPane.showMessageDialog(rootPane, Messages.ROOT_ELEMENT_IS_NOT_SELECTED.getDescription(),
+                    Messages.ROOT_ELEMENT_IS_NOT_SELECTED.getTitle(), JOptionPane.ERROR_MESSAGE);
+        } else {
+            String newName = JOptionPane.showInputDialog(
+                    rootPane,
+                    "Insert new name of root element:",
+                    "Rename root element",
+                    JOptionPane.QUESTION_MESSAGE);
+        }
+    }//GEN-LAST:event_rootElementRenameBtnActionPerformed
+
+    private void itemElementRenameBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemElementRenameBtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_itemElementRenameBtnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -409,11 +450,13 @@ public class XMLSplitUI extends javax.swing.JFrame {
     private javax.swing.JMenu helpMenu;
     private javax.swing.JLabel infoTextLabel;
     private javax.swing.JLabel itemElementLabel;
+    private javax.swing.JButton itemElementRenameBtn;
     private javax.swing.JMenuBar mainMenuBar;
     private javax.swing.JMenuItem openMenuItem;
     private javax.swing.JLabel outPutLabel;
     private javax.swing.JTextField outPutPathTextField;
     private javax.swing.JLabel rootElementLabel;
+    private javax.swing.JButton rootElementRenameBtn;
     private javax.swing.JButton selectItemBtn;
     private javax.swing.JButton selectRootBtn;
     private javax.swing.JLabel selectedItemElementLabel;

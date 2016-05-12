@@ -6,14 +6,6 @@
 package xml.split;
 
 import static java.lang.String.format;
-import static java.lang.String.format;
-import static java.lang.String.format;
-import static java.lang.String.format;
-import static java.lang.String.format;
-import static java.lang.String.format;
-import static java.lang.String.format;
-import static java.lang.String.format;
-import static java.lang.String.format;
 
 /**
  *
@@ -23,10 +15,10 @@ public enum Messages {
     MISSING_CONFIGURATION("Missing configuration!", "Something is missing. Check if all informations are provided."),
     ROOT_ELEMENT_IS_NOT_SELECTED("Root element is missing!", "You have to select a root element from file structure."),
     ITEM_ELEMENT_IS_NOT_SELECTED("Item element is missing!", "You have to select a item element from file structure."),
-    SPLIT_FINISHED("Complete!","File has been splited to %d files!");  
+    SPLIT_FINISHED("Complete!","File has been splited to %d files!");
     
-    private String title;
-    private String description;
+    private final String title;
+    private final String description;
 
     private Messages(String errorTitle, String errorDesc) {
         this.title = errorTitle;
